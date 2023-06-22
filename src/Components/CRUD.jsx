@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { CircularProgress } from "@mui/material";
+import { Button, Modal } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 import "./CRUD.css";
 
 export default function CRUD() {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const [buttonTitle, setButtonTitle] = useState("Submit");
   const [editData, setEditData] = useState({
@@ -19,6 +23,25 @@ export default function CRUD() {
     title: "",
     description: "",
   });
+
+  const handleEditModalOpen = (event) => {
+    event.preventDefault();
+    setIsEditModalOpen(true);
+  };
+  const handleEditModalClose = (event) => {
+    event.preventDefault();
+    setIsEditModalOpen(false);
+  };
+
+  const handleModalOpen = (event) => {
+    event.preventDefault();
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = (event) => {
+    event.preventDefault();
+    setIsModalOpen(false);
+  };
 
   const handleAddNew = (event) => {
     event.preventDefault();
@@ -43,6 +66,7 @@ export default function CRUD() {
 
           setData(updatedTexts);
           setButtonTitle("Submit");
+          handleModalClose(event);
         }, 1000);
         setButtonTitle("Loading");
       });
@@ -93,6 +117,7 @@ export default function CRUD() {
         updatedData[parseInt(editData.index)].body = editData.description;
         setData(updatedData);
         setButtonTitle("Submit");
+        handleEditModalClose(event);
       }, 1000);
       setButtonTitle("Loading");
     }
@@ -120,13 +145,15 @@ export default function CRUD() {
     const updateddata = data.filter((current, i) => i !== index);
     setData(updateddata);
   }
-  function handleEdit(item, index) {
+
+  function handleEdit(item, index, event) {
     setEditData({
       title: item.title,
       description: item.body,
       id: item._id,
       index: index,
     });
+    handleEditModalOpen(event);
   }
   function f() {
     setIsLoading(true);
@@ -281,7 +308,7 @@ export default function CRUD() {
                     </button>
                     <button
                       className="btn edit"
-                      onClick={() => handleEdit(current, index)}
+                      onClick={(event) => handleEdit(current, index, event)}
                     >
                       Edit
                     </button>
@@ -299,7 +326,7 @@ export default function CRUD() {
               width: "100%",
             }}
           >
-            <div className="container ">
+            {/* <div className="container ">
               <h1>Add New Recipie</h1>
               <form onSubmit={handleAddNew}>
                 <div>
@@ -330,8 +357,63 @@ export default function CRUD() {
                   value={buttonTitle}
                 />
               </form>
-            </div>
-            <div className="container">
+            </div> */}
+            <Button
+              onClick={handleModalOpen}
+              variant="contained"
+              color="primary"
+            >
+              <AddIcon />
+            </Button>
+            <Modal
+              open={isModalOpen}
+              onClose={handleModalClose}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              <div className="modal">
+                <div
+                  className="container "
+                  style={{ backgroundColor: "white" }}
+                >
+                  <h1>Add New Recipie</h1>
+                  <form onSubmit={handleAddNew}>
+                    <div>
+                      <label htmlFor="">Title</label>
+                      <input
+                        id="title"
+                        type="text"
+                        value={newData.title}
+                        placeholder="Enter Title"
+                        onChange={newhandleTitleChange}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="">Description</label>
+                      <input
+                        id="description"
+                        type="text"
+                        value={newData.description}
+                        placeholder="Enter Description"
+                        onChange={newhandleDescriptionChange}
+                        required
+                      />
+                    </div>
+                    <input
+                      type="submit"
+                      onSubmit={handleAddNew}
+                      value={buttonTitle}
+                    />
+                  </form>
+                </div>
+              </div>
+            </Modal>
+            {/* <div className="container">
               <h1>Edit Recipie</h1>
               <form onSubmit={SubmitEdit}>
                 <div>
@@ -362,7 +444,52 @@ export default function CRUD() {
                   value={buttonTitle}
                 />
               </form>
-            </div>
+            </div> */}
+            <Modal
+              open={isEditModalOpen}
+              onClose={handleEditModalClose}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+              <div className="modal">
+                <div className="container" style={{ backgroundColor: "white" }}>
+                  <h1>Edit Recipie</h1>
+                  <form onSubmit={SubmitEdit}>
+                    <div>
+                      <label htmlFor="">Title</label>
+                      <input
+                        id="edittitle"
+                        type="text"
+                        placeholder="Enter Title"
+                        value={editData.title}
+                        onChange={handleTitleChange}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="">Description</label>
+                      <input
+                        id="editdescription"
+                        type="text"
+                        value={editData.description}
+                        placeholder="Enter Description"
+                        onChange={handleDescriptionChange}
+                        required
+                      />
+                    </div>
+                    <input
+                      type="submit"
+                      onSubmit={SubmitEdit}
+                      value={buttonTitle}
+                    />
+                  </form>
+                </div>
+              </div>
+            </Modal>
           </div>
         </>
       )}
